@@ -227,7 +227,7 @@ if modulo == "Simulador de Tasación":
         with col9:
             garage_cars = st.number_input("Capacidad de Garaje (Vehículos)", value=2, min_value=0, max_value=5)
 
-        btn_calcular = st.form_submit_button("⚡ Generar Tasación Comercial")
+        btn_calcular = st.form_submit_button("Generar Tasación Comercial")
 
     if btn_calcular:
         inmueble_input = pd.DataFrame([{
@@ -316,7 +316,7 @@ elif modulo == "Tasación Masiva en Lote":
             if columnas_faltantes:
                 st.error(f"El archivo no contiene las siguientes columnas requeridas: `{columnas_faltantes}`")
             else:
-                if st.button("🚀 Procesar Tasaciones Masivas"):
+                if st.button("Procesar Tasaciones Masivas"):
                     df_pred = df_batch[columnas_predictoras].copy()
                     predicciones_lote = pipeline_modelo.predict(df_pred)
 
@@ -329,7 +329,7 @@ elif modulo == "Tasación Masiva en Lote":
 
                     csv_descarga = df_batch.to_csv(index=False).encode('utf-8')
                     st.download_button(
-                        label="📥 Descargar Tasaciones Resultantes (.csv)",
+                        label="Descargar Tasaciones Resultantes (.csv)",
                         data=csv_descarga,
                         file_name="tasaciones_inmobiliarias_resultado.csv",
                         mime="text/csv"
