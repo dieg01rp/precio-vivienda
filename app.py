@@ -304,7 +304,7 @@ elif modulo == "Tasación Masiva en Lote":
     st.subheader("Módulo de Procesamiento Masivo")
     st.write("Suba un archivo en formato CSV con múltiples propiedades para procesar sus valoraciones en lote de manera automática:")
 
-    archivo_masivo = st.file_uploader("Cargar CSV de propiedades", type=["csv"])
+    archivo_masivo = st.file_uploader("Cargar CSV de propiedades", type=["csv"], help="200MB por archivo")
 
     if archivo_masivo is not None:
         try:
