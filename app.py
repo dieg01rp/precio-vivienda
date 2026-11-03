@@ -26,7 +26,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 # CONFIGURACIÓN GENERAL Y ESTILOS PROFESIONALES
 # =============================================================================
 st.set_page_config(
-    page_title="ValuaHome AI - Sistema de Tasación Inmobiliaria",
+    page_title="Sistema Predictivo del Precio de Venta de Viviendas",
     page_icon="🏢",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -78,8 +78,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Header principal
-st.markdown('<div class="main-title">🏢 ValuaHome AI — Plataforma de Tasación Inmobiliaria</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">Motor de inteligencia predictiva para estimación comercial de bienes raíces residenciales | <b>Mercado Ames, Iowa</b></div>', unsafe_allow_html=True)
+st.markdown('<div class="main-title">Sistema Predictivo del Precio de Venta de Viviendas</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">Soporte para tasadores, entidades hipotecarias y compradores antes de fijar el precio de oferta o aprobar financiamiento.</b></div>', unsafe_allow_html=True)
 st.markdown("---")
 
 # =============================================================================
@@ -176,23 +176,22 @@ pipeline_modelo = entrenar_modelo_produccion(X_train, y_train)
 # =============================================================================
 # MENÚ NAVEGACIÓN PRODUCCIÓN
 # =============================================================================
-st.sidebar.image("https://cdn-icons-png.flaticon.com/512/609/609803.png", width=70)
 st.sidebar.markdown("### **Panel de Control**")
 modulo = st.sidebar.radio("Seleccione el Módulo:", [
-    "🏡 Simulador de Tasación",
-    "📊 Métricas y Desempeño Modelo",
-    "📁 Tasación Masiva en Lote"
+    "Simulador de Tasación",
+    "Métricas y Desempeño Modelo",
+    "Tasación Masiva en Lote"
 ])
 
 st.sidebar.markdown("---")
-st.sidebar.caption("🟢 **Servidor de Producción:** Activo")
-st.sidebar.caption("⚡ **Motor ML:** SVR (Kernel RBF - Calibrado)")
+st.sidebar.caption("**Servidor de Producción:** Activo")
+st.sidebar.caption("**Motor ML:** SVR (Kernel RBF - Calibrado)")
 
 # =============================================================================
 # MÓDULO 1: SIMULADOR DE TASACIÓN (PREDICCIÓN EN VIVO)
 # =============================================================================
-if modulo == "🏡 Simulador de Tasación":
-    st.subheader("🏡 Calculadora de Valor Comercial de Inmuebles")
+if modulo == "Simulador de Tasación":
+    st.subheader("Calculadora de Valor Comercial de Inmuebles")
     st.write("Ingrese las especificaciones del inmueble para generar la tasación automatizada:")
 
     with st.form("form_tasacion"):
@@ -259,8 +258,8 @@ if modulo == "🏡 Simulador de Tasación":
 # =============================================================================
 # MÓDULO 2: MÉTRICAS Y DESEMPEÑO DEL MODELO
 # =============================================================================
-elif modulo == "📊 Métricas y Desempeño Modelo":
-    st.subheader("📊 Panel de Validación y Precisión del Modelo")
+elif modulo == "Métricas y Desempeño Modelo":
+    st.subheader("Panel de Validación y Precisión del Modelo")
     st.write("Estadísticas de rendimiento del motor predictivo sobre el conjunto de prueba reservado:")
 
     y_pred_test = pipeline_modelo.predict(X_test)
@@ -302,8 +301,8 @@ elif modulo == "📊 Métricas y Desempeño Modelo":
 # =============================================================================
 # MÓDULO 3: TASACIÓN MASIVA EN LOTE
 # =============================================================================
-elif modulo == "📁 Tasación Masiva en Lote":
-    st.subheader("📁 Módulo de Procesamiento Masivo")
+elif modulo == "Tasación Masiva en Lote":
+    st.subheader("Módulo de Procesamiento Masivo")
     st.write("Suba un archivo en formato CSV con múltiples propiedades para procesar sus valoraciones en lote de manera automática:")
 
     archivo_masivo = st.file_uploader("Cargar CSV de propiedades", type=["csv"])
@@ -339,4 +338,4 @@ elif modulo == "📁 Tasación Masiva en Lote":
         except Exception as e:
             st.error(f"Error al procesar el archivo: {e}")
     else:
-        st.info("💡 **Plantilla sugerida:** El archivo CSV de entrada debe contener las 15 columnas utilizadas para la tasación (GrLivArea, TotalBsmtSF, OverallQual, Neighborhood, etc.).")
+        st.info("**Plantilla sugerida:** El archivo CSV de entrada debe contener las 15 columnas utilizadas para la tasación (GrLivArea, TotalBsmtSF, OverallQual, Neighborhood, etc.).")
