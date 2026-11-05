@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
@@ -78,7 +78,7 @@ st.markdown("""
 
 # Header principal
 st.markdown('<div class="main-title">Sistema Predictivo del Precio de Venta de Viviendas</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">Soporte para tasadores, entidades hipotecarias y compradores antes de fijar el precio de oferta o aprobar financiamiento.</b></div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">Soporte para tasadores, entidades hipotecarias y compradores antes de fijar el precio de oferta o aprobar financiamiento.</div>', unsafe_allow_html=True)
 st.markdown("---")
 
 # =============================================================================
@@ -172,6 +172,13 @@ def entrenar_modelo_produccion(_X_tr, _y_tr):
 
 pipeline_modelo = entrenar_modelo_produccion(X_train, y_train)
 
+# Función en caché para calcular la validación cruzada y acelerar la interfaz
+@st.cache_data
+def calcular_cv_scores(_pipeline, _X_tr, _y_tr):
+    scores_mae = -cross_val_score(_pipeline, _X_tr, _y_tr, cv=5, scoring="neg_mean_absolute_error")
+    scores_r2 = cross_val_score(_pipeline, _X_tr, _y_tr, cv=5, scoring="r2")
+    return scores_mae, scores_r2
+
 # =============================================================================
 # MENÚ NAVEGACIÓN PRODUCCIÓN
 # =============================================================================
@@ -238,7 +245,7 @@ if modulo == "Simulador de Tasación":
         }])
 
         prediccion_val = pipeline_modelo.predict(inmueble_input)[0]
-        mae_estimado = 17270.0 # Valor obtenido en la calibración técnica
+        mae_estimado = 17270.0  # Valor de calibración técnica
 
         st.markdown(f"""
         <div class="prediction-box">
@@ -255,7 +262,7 @@ if modulo == "Simulador de Tasación":
         m3.metric("Nivel de Calidad Evaluado", f"{overall_qual} / 10")
 
 # =============================================================================
-# MÓDULO 2: MÉTRICAS Y DESEMPEÑO DEL MODELO
+# MÓDULO 2: MÉTRICAS Y DESEMPEÑO DEL MODELO (CON VALIDACIÓN CRUZADA)
 # =============================================================================
 elif modulo == "Métricas y Desempeño Modelo":
     st.subheader("Panel de Validación y Precisión del Modelo")
@@ -297,6 +304,25 @@ elif modulo == "Métricas y Desempeño Modelo":
         ax2.grid(alpha=0.3)
         st.pyplot(fig2)
 
+    st.markdown("---")
+
+    # SECCIÓN NUEVA INTEGRADA: VALIDACIÓN CRUZADA
+    with st.expander("🔍 Ver Detalle de Validación Cruzada (5-Fold CV) - Estabilidad del Modelo", expanded=True):
+        st.write("Evaluación de robustez dividiendo el conjunto de entrenamiento en 5 particiones para descartar sobreajuste (*overfitting*):")
+
+        cv_mae_scores, cv_r2_scores = calcular_cv_scores(pipeline_modelo, X_train, y_train)
+
+        cv_col1, cv_col2 = st.columns(2)
+        cv_col1.metric("MAE Promedio (5-Fold CV)", f"${cv_mae_scores.mean():,.2f} USD", f"Desv. Est: ±${cv_mae_scores.std():,.2f}")
+        cv_col2.metric("R² Promedio (5-Fold CV)", f"{cv_r2_scores.mean():.4f}", f"Desv. Est: ±{cv_r2_scores.std():.4f}")
+
+        df_cv_detalles = pd.DataFrame({
+            "Pliegue (Fold)": ["Fold 1", "Fold 2", "Fold 3", "Fold 4", "Fold 5"],
+            "MAE por Pliegue ($ USD)": np.round(cv_mae_scores, 2),
+            "R² por Pliegue": np.round(cv_r2_scores, 4)
+        })
+        st.dataframe(df_cv_detalles, use_container_width=True)
+
 # =============================================================================
 # MÓDULO 3: TASACIÓN MASIVA EN LOTE
 # =============================================================================
@@ -304,7 +330,7 @@ elif modulo == "Tasación Masiva en Lote":
     st.subheader("Módulo de Procesamiento Masivo")
     st.write("Suba un archivo en formato CSV con múltiples propiedades para procesar sus valoraciones en lote de manera automática:")
 
-    archivo_masivo = st.file_uploader("Cargar CSV de propiedades", type=["csv"], help="200MB por archivo")
+    archivo_masivo = st.file_uploader("Cargar CSV de propiedades", type=["csv"])
 
     if archivo_masivo is not None:
         try:
